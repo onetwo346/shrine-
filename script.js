@@ -59,17 +59,20 @@ animateStars();
 // Portal Transition
 startButton.addEventListener("click", () => {
   const portalOverlay = document.getElementById("portal-overlay");
-  portalOverlay.classList.remove("hidden");
-  setTimeout(() => {
-    introPage.style.display = "none";
-    mainPage.style.display = "block";
-    portalOverlay.classList.add("hidden");
-  }, 2000);
+  if (portalOverlay) {
+    portalOverlay.classList.remove("hidden");
+    setTimeout(() => {
+      introPage.style.display = "none";
+      mainPage.style.display = "block";
+      portalOverlay.classList.add("hidden");
+    }, 2000);
+  }
 });
 
 // Display Books
-function displayBooks(books) {
-  bookGrid.innerHTML = books.map(book => `
+function displayBooks(booksToShow) {
+  if (!bookGrid) return; // Safety check
+  bookGrid.innerHTML = booksToShow.map(book => `
     <div class="book-item">
       <h2>${book.title}</h2>
       <p>${book.author}</p>
@@ -84,8 +87,8 @@ function displayBooks(books) {
       const rect = item.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      const rotateY = x / 10;
-      const rotateX = -y / 10;
+      const rotateY = Math.min(Math.max(x / 10, -20), 20); // Limit tilt
+      const rotateX = Math.min(Math.max(-y / 10, -20), 20);
       item.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
     item.addEventListener("mouseleave", () => {
@@ -96,52 +99,60 @@ function displayBooks(books) {
 
 // Search Books
 function searchBooks() {
-  const query = searchInput.value.toLowerCase();
+  if (!searchInput || !bookGrid) return; // Safety check
+  const query = searchInput.value.toLowerCase().trim();
   const filteredBooks = books.filter(book =>
     book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query)
   );
   displayBooks(filteredBooks);
 }
 
-// Chatbot Functionality
+// Chatbot Logic
 function chatbotResponse(message) {
   const msg = message.toLowerCase().trim();
-  let response = "The Shrine ponders your query...";
+  let response = "The Shrine hums with cosmic energy...";
 
-  // Basic Shrine Info
-  if (msg.includes("what is book shrine") || msg.includes("what’s this")) {
-    response = "I am the Book Shrine, a cosmic archive of knowledge and stories, crafted by Kofi Fosu. I hold tales of romance, adventure, and the unknown. Ask me anything about my collection.";
+  // Core Shrine Info
+  if (msg === "what is book shrine" || msg.includes("what is this")) {
+    response = "I am the Book Shrine, a celestial vault of tales woven by Kofi Fosu. I guard stories of romance, adventure, and the infinite unknown. Ask me about my collection.";
   } 
-  else if (msg.includes("how many books")) {
-    response = `The Shrine contains ${books.length} sacred tomes, each a portal to another realm.`;
+  else if (msg.includes("how many books") || msg === "book count") {
+    response = `The Shrine holds ${books.length} sacred volumes, each a gateway to another dimension.`;
   } 
-  else if (msg.includes("who made") || msg.includes("who created")) {
-    response = "I was forged by Kofi Fosu, a cosmic coder of worlds. Reach him at cosmoscoderr@gmail.com.";
+  else if (msg.includes("who made") || msg.includes("who created") || msg.includes("who built")) {
+    response = "I was crafted by Kofi Fosu, a visionary of the cosmos. Contact him at cosmoscoderr@gmail.com.";
   } 
-  else if (msg.includes("recommend") || msg.includes("suggest")) {
-    const randomBooks = books.sort(() => 0.5 - Math.random()).slice(0, 3);
-    response = "The void suggests these treasures:\n" + randomBooks.map(b => `- ${b.title} by ${b.author}: ${b.description}`).join("\n");
+  // Book Recommendations
+  else if (msg.includes("recommend") || msg.includes("suggest") || msg.includes("what should i read")) {
+    const randomBooks = books.sort(() => 0.5 - Math.random()).slice(0, 3); // Shuffle and pick 3
+    response = "The stars align to suggest these works:\n" + 
+      randomBooks.map(b => `- ${b.title} by ${b.author}: ${b.description}`).join("\n");
   } 
-  else if (msg.includes("list books") || msg.includes("what books")) {
-    response = "Here are the tomes within my shrine:\n" + books.map(b => `- ${b.title} by ${b.author}`).join("\n");
+  // List All Books
+  else if (msg.includes("list books") || msg.includes("what books") || msg.includes("show books")) {
+    response = "Behold the Shrine’s collection:\n" + 
+      books.map(b => `- ${b.title} by ${b.author}`).join("\n");
   } 
-  else if (msg.includes("hi") || msg.includes("hello")) {
-    response = "Greetings, traveler. I am the Book Shrine AI, guardian of these tales. How may I assist you?";
+  // Greetings
+  else if (msg === "hi" || msg === "hello" || msg.includes("hey")) {
+    response = "Greetings, seeker of knowledge. I am the Book Shrine AI, keeper of these tales. How may I serve you?";
   } 
+  // Specific Book Queries
   else {
-    // Check for specific book queries
     const foundBook = books.find(book => msg.includes(book.title.toLowerCase()));
     if (foundBook) {
-      response = `Ah, ${foundBook.title} by ${foundBook.author}: ${foundBook.description}. A fine choice from the Shrine.`;
+      response = `${foundBook.title} by ${foundBook.author}: ${foundBook.description}. A worthy tome from my archive.`;
     } else {
-      response = "The cosmos is vast, yet I’m unsure of your request. Ask about my books or the Shrine itself.";
+      response = "The void murmurs uncertainty. Ask about my books or the Shrine itself—perhaps a title or a question ?";
     }
   }
 
   return response;
 }
 
+// Chatbot Interaction
 sendButton.addEventListener("click", () => {
+  if (!chatbotInput || !chatbotMessages) return; // Safety check
   const userMessage = chatbotInput.value.trim();
   if (userMessage) {
     addMessage(userMessage, "user");
@@ -149,21 +160,26 @@ sendButton.addEventListener("click", () => {
     setTimeout(() => {
       const response = chatbotResponse(userMessage);
       addMessage(response, "bot");
-    }, 1000);
+    }, 1000); // Slight delay for realism
   }
 });
 
 function addMessage(text, sender) {
+  if (!chatbotMessages) return; // Safety check
   const messageElement = document.createElement("div");
   messageElement.textContent = text;
-  messageElement.style = sender === "user" ? "text-align: right; color: #00ffff; margin: 5px 0;" : "text-align: left; color: #ddd; margin: 5px 0;";
+  messageElement.style = sender === "user" 
+    ? "text-align: right; color: #00ffff; margin: 5px 0; white-space: pre-wrap;" 
+    : "text-align: left; color: #ddd; margin: 5px 0; white-space: pre-wrap;";
   chatbotMessages.appendChild(messageElement);
   chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
 // Chatbot Toggle
 chatbotCore.addEventListener("click", () => {
-  chatbotWindow.classList.toggle("hidden");
+  if (chatbotWindow) {
+    chatbotWindow.classList.toggle("hidden");
+  }
 });
 
 // Initial Display
