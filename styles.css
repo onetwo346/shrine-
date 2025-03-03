@@ -229,6 +229,27 @@ footer a {
   box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
 }
 
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ff00ff;
+  color: #00ffff;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+.close-button:hover {
+  background: #00ffff;
+  color: #ff00ff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+}
+
 .message-field {
   height: 200px;
   overflow-y: auto;
