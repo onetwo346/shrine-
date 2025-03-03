@@ -25,7 +25,6 @@ body {
   z-index: -1;
 }
 
-/* Intro Page */
 #intro-page {
   position: absolute;
   top: 0;
@@ -108,7 +107,6 @@ body {
   100% { transform: translate(-50%, -50%) scale(4) rotate(540deg); opacity: 0; }
 }
 
-/* Main Page */
 #main-page {
   position: relative;
   z-index: 5;
@@ -197,7 +195,6 @@ footer a {
   color: #00ffff;
 }
 
-/* Cosmic Chatbot */
 .cosmic-chat {
   position: fixed;
   bottom: 20px;
