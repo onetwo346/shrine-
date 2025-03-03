@@ -78,7 +78,6 @@ function displayBooks(books) {
     </div>
   `).join("");
 
-  // Custom Tilt Effect
   const bookItems = document.querySelectorAll(".book-item");
   bookItems.forEach(item => {
     item.addEventListener("mousemove", (e) => {
@@ -105,13 +104,51 @@ function searchBooks() {
 }
 
 // Chatbot Functionality
+function chatbotResponse(message) {
+  const msg = message.toLowerCase().trim();
+  let response = "The Shrine ponders your query...";
+
+  // Basic Shrine Info
+  if (msg.includes("what is book shrine") || msg.includes("what’s this")) {
+    response = "I am the Book Shrine, a cosmic archive of knowledge and stories, crafted by Kofi Fosu. I hold tales of romance, adventure, and the unknown. Ask me anything about my collection.";
+  } 
+  else if (msg.includes("how many books")) {
+    response = `The Shrine contains ${books.length} sacred tomes, each a portal to another realm.`;
+  } 
+  else if (msg.includes("who made") || msg.includes("who created")) {
+    response = "I was forged by Kofi Fosu, a cosmic coder of worlds. Reach him at cosmoscoderr@gmail.com.";
+  } 
+  else if (msg.includes("recommend") || msg.includes("suggest")) {
+    const randomBooks = books.sort(() => 0.5 - Math.random()).slice(0, 3);
+    response = "The void suggests these treasures:\n" + randomBooks.map(b => `- ${b.title} by ${b.author}: ${b.description}`).join("\n");
+  } 
+  else if (msg.includes("list books") || msg.includes("what books")) {
+    response = "Here are the tomes within my shrine:\n" + books.map(b => `- ${b.title} by ${b.author}`).join("\n");
+  } 
+  else if (msg.includes("hi") || msg.includes("hello")) {
+    response = "Greetings, traveler. I am the Book Shrine AI, guardian of these tales. How may I assist you?";
+  } 
+  else {
+    // Check for specific book queries
+    const foundBook = books.find(book => msg.includes(book.title.toLowerCase()));
+    if (foundBook) {
+      response = `Ah, ${foundBook.title} by ${foundBook.author}: ${foundBook.description}. A fine choice from the Shrine.`;
+    } else {
+      response = "The cosmos is vast, yet I’m unsure of your request. Ask about my books or the Shrine itself.";
+    }
+  }
+
+  return response;
+}
+
 sendButton.addEventListener("click", () => {
   const userMessage = chatbotInput.value.trim();
   if (userMessage) {
     addMessage(userMessage, "user");
     chatbotInput.value = "";
     setTimeout(() => {
-      addMessage("The void whispers back: I’m here to guide you.", "bot");
+      const response = chatbotResponse(userMessage);
+      addMessage(response, "bot");
     }, 1000);
   }
 });
@@ -119,7 +156,7 @@ sendButton.addEventListener("click", () => {
 function addMessage(text, sender) {
   const messageElement = document.createElement("div");
   messageElement.textContent = text;
-  messageElement.style = sender === "user" ? "text-align: right; color: #00ffff;" : "text-align: left; color: #ddd;";
+  messageElement.style = sender === "user" ? "text-align: right; color: #00ffff; margin: 5px 0;" : "text-align: left; color: #ddd; margin: 5px 0;";
   chatbotMessages.appendChild(messageElement);
   chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
