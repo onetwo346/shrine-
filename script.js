@@ -22,6 +22,7 @@ const chatbotWindow = document.getElementById("chatbot-window");
 const chatbotInput = document.getElementById("chatbot-input");
 const sendButton = document.getElementById("send-button");
 const chatbotMessages = document.getElementById("chatbot-messages");
+const closeChatbot = document.getElementById("close-chatbot");
 const canvas = document.getElementById("cosmic-canvas");
 const ctx = canvas.getContext("2d");
 
@@ -71,7 +72,7 @@ startButton.addEventListener("click", () => {
 
 // Display Books
 function displayBooks(booksToShow) {
-  if (!bookGrid) return; // Safety check
+  if (!bookGrid) return;
   bookGrid.innerHTML = booksToShow.map(book => `
     <div class="book-item">
       <h2>${book.title}</h2>
@@ -87,7 +88,7 @@ function displayBooks(booksToShow) {
       const rect = item.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      const rotateY = Math.min(Math.max(x / 10, -20), 20); // Limit tilt
+      const rotateY = Math.min(Math.max(x / 10, -20), 20);
       const rotateX = Math.min(Math.max(-y / 10, -20), 20);
       item.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
@@ -99,7 +100,7 @@ function displayBooks(booksToShow) {
 
 // Search Books
 function searchBooks() {
-  if (!searchInput || !bookGrid) return; // Safety check
+  if (!searchInput || !bookGrid) return;
   const query = searchInput.value.toLowerCase().trim();
   const filteredBooks = books.filter(book =>
     book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query)
@@ -112,7 +113,6 @@ function chatbotResponse(message) {
   const msg = message.toLowerCase().trim();
   let response = "The Shrine hums with cosmic energy...";
 
-  // Core Shrine Info
   if (msg === "what is book shrine" || msg.includes("what is this")) {
     response = "I am the Book Shrine, a celestial vault of tales woven by Kofi Fosu. I guard stories of romance, adventure, and the infinite unknown. Ask me about my collection.";
   } 
@@ -122,28 +122,24 @@ function chatbotResponse(message) {
   else if (msg.includes("who made") || msg.includes("who created") || msg.includes("who built")) {
     response = "I was crafted by Kofi Fosu, a visionary of the cosmos. Contact him at cosmoscoderr@gmail.com.";
   } 
-  // Book Recommendations
   else if (msg.includes("recommend") || msg.includes("suggest") || msg.includes("what should i read")) {
-    const randomBooks = books.sort(() => 0.5 - Math.random()).slice(0, 3); // Shuffle and pick 3
+    const randomBooks = books.sort(() => 0.5 - Math.random()).slice(0, 3);
     response = "The stars align to suggest these works:\n" + 
       randomBooks.map(b => `- ${b.title} by ${b.author}: ${b.description}`).join("\n");
   } 
-  // List All Books
   else if (msg.includes("list books") || msg.includes("what books") || msg.includes("show books")) {
     response = "Behold the Shrine’s collection:\n" + 
       books.map(b => `- ${b.title} by ${b.author}`).join("\n");
   } 
-  // Greetings
   else if (msg === "hi" || msg === "hello" || msg.includes("hey")) {
     response = "Greetings, seeker of knowledge. I am the Book Shrine AI, keeper of these tales. How may I serve you?";
   } 
-  // Specific Book Queries
   else {
     const foundBook = books.find(book => msg.includes(book.title.toLowerCase()));
     if (foundBook) {
       response = `${foundBook.title} by ${foundBook.author}: ${foundBook.description}. A worthy tome from my archive.`;
     } else {
-      response = "The void murmurs uncertainty. Ask about my books or the Shrine itself—perhaps a title or a question ?";
+      response = "The void murmurs uncertainty. Ask about my books or the Shrine itself—perhaps a title or a question?";
     }
   }
 
@@ -152,7 +148,7 @@ function chatbotResponse(message) {
 
 // Chatbot Interaction
 sendButton.addEventListener("click", () => {
-  if (!chatbotInput || !chatbotMessages) return; // Safety check
+  if (!chatbotInput || !chatbotMessages) return;
   const userMessage = chatbotInput.value.trim();
   if (userMessage) {
     addMessage(userMessage, "user");
@@ -160,12 +156,12 @@ sendButton.addEventListener("click", () => {
     setTimeout(() => {
       const response = chatbotResponse(userMessage);
       addMessage(response, "bot");
-    }, 1000); // Slight delay for realism
+    }, 1000);
   }
 });
 
 function addMessage(text, sender) {
-  if (!chatbotMessages) return; // Safety check
+  if (!chatbotMessages) return;
   const messageElement = document.createElement("div");
   messageElement.textContent = text;
   messageElement.style = sender === "user" 
@@ -175,10 +171,16 @@ function addMessage(text, sender) {
   chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
-// Chatbot Toggle
+// Chatbot Toggle and Close
 chatbotCore.addEventListener("click", () => {
   if (chatbotWindow) {
     chatbotWindow.classList.toggle("hidden");
+  }
+});
+
+closeChatbot.addEventListener("click", () => {
+  if (chatbotWindow) {
+    chatbotWindow.classList.add("hidden");
   }
 });
 
