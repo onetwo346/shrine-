@@ -18,9 +18,6 @@ body {
   color: #fff;
   overflow-x: hidden;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -130,7 +127,7 @@ body {
 #main-page {
   position: relative;
   z-index: 5;
-  flex: 1;
+  padding-bottom: 120px; /* Ensure content doesn't overlap with the fixed footer */
 }
 
 header {
@@ -208,9 +205,11 @@ footer {
   text-align: center;
   padding: 20px;
   background: rgba(255, 0, 255, 0.1);
-  position: relative;
+  position: fixed; /* Pin the footer to the bottom */
+  bottom: 0;
+  left: 0;
+  width: 100%;
   z-index: 10;
-  margin-top: auto; /* Pushes footer to the bottom */
 }
 
 .footer-content {
@@ -254,7 +253,7 @@ footer a {
 
 .cosmic-chat {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px; /* Adjusted to ensure chat orb doesn't overlap with fixed footer */
   right: 20px;
 }
 
@@ -338,6 +337,7 @@ footer a {
   .warp-button { padding: 12px 25px; font-size: 1.2rem; }
   .book-grid { padding: 20px; }
   .cosmic-panel { width: 90vw; }
+  #main-page { padding-bottom: 150px; } /* Adjust padding for smaller screens */
 }
 
 @media (max-width: 480px) {
@@ -345,4 +345,5 @@ footer a {
   .cosmic-text p { font-size: 1rem; }
   .warp-button { padding: 10px 20px; font-size: 1rem; }
   .book-item { width: 100%; max-width: 300px; }
+  #main-page { padding-bottom: 180px; } /* Adjust padding for very small screens */
 }
