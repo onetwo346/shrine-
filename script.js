@@ -182,11 +182,14 @@ function addMessage(text, sender) {
 }
 
 // Chatbot Toggle
-chatbotCore.addEventListener("click", () => {
-  clickSound.play();
-  chatbotWindow.classList.toggle("hidden");
-  if (!chatbotWindow.classList.contains("hidden") && !chatbotMessages.children.length) {
-    addMessage("Welcome to BookShrine! How may I assist you?", "bot");
+chatbotCore.addEventListener("click", (e) => {
+  // Prevent click event from interfering with drag
+  if (e.type === "click" && !chatbotCore.isDragging) {
+    clickSound.play();
+    chatbotWindow.classList.toggle("hidden");
+    if (!chatbotWindow.classList.contains("hidden") && !chatbotMessages.children.length) {
+      addMessage("Welcome to BookShrine! How may I assist you?", "bot");
+    }
   }
 });
 
@@ -195,6 +198,80 @@ closeChatbot.addEventListener("click", () => {
   chatbotWindow.classList.add("hidden");
 });
 
+// Make Chatbot Draggable
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+
+chatbotCore.addEventListener("mousedown", startDragging);
+chatbotCore.addEventListener("touchstart", startDragging);
+
+chatbotCore.addEventListener("mousemove", drag);
+chatbotCore.addEventListener("touchmove", drag);
+
+chatbotCore.addEventListener("mouseup", stopDragging);
+chatbotCore.addEventListener("touchend", stopDragging);
+
+function startDragging(e) {
+  e.preventDefault();
+  isDragging = true;
+  chatbotCore.isDragging = true;
+
+  if (e.type === "touchstart") {
+    initialX = e.touches[0].clientX - currentX;
+    initialY = e.touches[0].clientY - currentY;
+  } else {
+    initialX = e.clientX - currentX;
+    initialY = e.clientY - currentY;
+  }
+}
+
+function drag(e) {
+  if (isDragging) {
+    e.preventDefault();
+    if (e.type === "touchmove") {
+      currentX = e.touches[0].clientX - initialX;
+      currentY = e.touches[0].clientY - initialY;
+    } else {
+      currentX = e.clientX - initialX;
+      currentY = e.clientY - initialY;
+    }
+
+    // Boundary checks to keep the orb within the viewport
+    const orbWidth = chatbotCore.offsetWidth;
+    const orbHeight = chatbotCore.offsetHeight;
+    const maxX = window.innerWidth - orbWidth;
+    const maxY = window.innerHeight - orbHeight;
+
+    currentX = Math.max(0, Math.min(currentX, maxX));
+    currentY = Math.max(0, Math.min(currentY, maxY));
+
+    chatbotCore.style.left = currentX + "px";
+    chatbotCore.style.top = currentY + "px";
+    chatbotCore.style.bottom = "auto";
+    chatbotCore.style.right = "auto";
+
+    // Adjust chatbot window position to follow the orb
+    chatbotWindow.style.right = "0px";
+    chatbotWindow.style.bottom = (orbHeight + 10) + "px";
+  }
+}
+
+function stopDragging() {
+  isDragging = false;
+  setTimeout(() => {
+    chatbotCore.isDragging = false;
+  }, 50); // Small delay to ensure click event isn't triggered immediately after drag
+}
+
+// Initialize position
+currentX = window.innerWidth - 70; // Initial right: 20px
+currentY = window.innerHeight - 70; // Initial bottom: 20px
+chatbotCore.style.left = currentX + "px";
+chatbotCore.style.top = currentY + "px";
+
 // Initial Display
 displayBooks(books);
 
@@ -202,4 +279,13 @@ displayBooks(books);
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  // Adjust chatbot position on resize
+  const orbWidth = chatbotCore.offsetWidth;
+  const orbHeight = chatbotCore.offsetHeight;
+  const maxX = window.innerWidth - orbWidth;
+  const maxY = window.innerHeight - orbHeight;
+  currentX = Math.min(currentX, maxX);
+  currentY = Math.min(currentY, maxY);
+  chatbotCore.style.left = currentX + "px";
+  chatbotCore.style.top = currentY + "px";
 });
