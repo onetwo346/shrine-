@@ -183,7 +183,6 @@ function addMessage(text, sender) {
 
 // Chatbot Toggle
 chatbotCore.addEventListener("click", (e) => {
-  // Prevent click event from interfering with drag
   if (e.type === "click" && !chatbotCore.isDragging) {
     clickSound.play();
     chatbotWindow.classList.toggle("hidden");
@@ -220,11 +219,11 @@ function startDragging(e) {
   chatbotCore.isDragging = true;
 
   if (e.type === "touchstart") {
-    initialX = e.touches[0].clientX - currentX;
-    initialY = e.touches[0].clientY - currentY;
+    initialX = e.touches[0].clientX - (currentX || 0);
+    initialY = e.touches[0].clientY - (currentY || 0);
   } else {
-    initialX = e.clientX - currentX;
-    initialY = e.clientY - currentY;
+    initialX = e.clientX - (currentX || 0);
+    initialY = e.clientY - (currentY || 0);
   }
 }
 
@@ -239,7 +238,6 @@ function drag(e) {
       currentY = e.clientY - initialY;
     }
 
-    // Boundary checks to keep the orb within the viewport
     const orbWidth = chatbotCore.offsetWidth;
     const orbHeight = chatbotCore.offsetHeight;
     const maxX = window.innerWidth - orbWidth;
@@ -253,7 +251,6 @@ function drag(e) {
     chatbotCore.style.bottom = "auto";
     chatbotCore.style.right = "auto";
 
-    // Adjust chatbot window position to follow the orb
     chatbotWindow.style.right = "0px";
     chatbotWindow.style.bottom = (orbHeight + 10) + "px";
   }
@@ -263,12 +260,11 @@ function stopDragging() {
   isDragging = false;
   setTimeout(() => {
     chatbotCore.isDragging = false;
-  }, 50); // Small delay to ensure click event isn't triggered immediately after drag
+  }, 50);
 }
 
-// Initialize position
-currentX = window.innerWidth - 70; // Initial right: 20px
-currentY = window.innerHeight - 70; // Initial bottom: 20px
+currentX = window.innerWidth - 70;
+currentY = window.innerHeight - 70;
 chatbotCore.style.left = currentX + "px";
 chatbotCore.style.top = currentY + "px";
 
@@ -279,7 +275,6 @@ displayBooks(books);
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  // Adjust chatbot position on resize
   const orbWidth = chatbotCore.offsetWidth;
   const orbHeight = chatbotCore.offsetHeight;
   const maxX = window.innerWidth - orbWidth;
